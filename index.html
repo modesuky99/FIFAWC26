@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>الكورة مع معاملي - بث مباشر</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%230a0a1a' stroke='%23b044ff' stroke-width='3'/%3E%3Cpath d='M50 12 Q60 35 72 28 Q55 50 50 50 Q45 50 28 28 Q40 35 50 12' fill='%23b044ff'/%3E%3Cpath d='M50 88 Q40 65 28 72 Q45 50 50 50 Q55 50 72 72 Q60 65 50 88' fill='%23b044ff'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%23b044ff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- نجوم الخلفية -->
+  <canvas id="starsCanvas"></canvas>
+
+  <!-- عناصر الخلفية المتحركة -->
+  <div id="bgElements">
+    <div class="crystal cr-1"></div>
+    <div class="crystal cr-2"></div>
+    <div class="crystal cr-3"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+    <div class="float-island island-1">
+      <svg viewBox="0 0 200 80" fill="none">
+        <path d="M20 60 Q50 20 100 25 Q150 20 180 60 Q150 70 100 65 Q50 70 20 60Z"
+              fill="rgba(176,68,255,0.06)" stroke="rgba(176,68,255,0.15)" stroke-width="1"/>
+        <path d="M60 30 Q70 10 80 30" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+        <path d="M110 25 Q120 5 130 25" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="float-island island-2">
+      <svg viewBox="0 0 150 60" fill="none">
+        <path d="M10 45 Q40 15 75 20 Q110 15 140 45 Q110 55 75 50 Q40 55 10 45Z"
+              fill="rgba(255,0,170,0.04)" stroke="rgba(255,0,170,0.1)" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="phoenix-ph">
+      <svg viewBox="0 0 120 100" fill="none">
+        <path d="M60 20 Q80 5 90 25 Q95 40 80 50 Q90 55 85 70 Q75 85 60 80 Q45 85 35 70 Q30 55 40 50 Q25 40 30 25 Q40 5 60 20Z"
+              fill="none" stroke="rgba(255,140,0,0.12)" stroke-width="1.5"/>
+        <path d="M60 30 Q70 20 75 30 Q78 40 65 45 Q50 45 42 30 Q37 20 60 30Z"
+              fill="rgba(255,100,0,0.08)"/>
+        <path d="M50 50 Q30 60 20 80" stroke="rgba(255,0,170,0.1)" stroke-width="1"/>
+        <path d="M70 50 Q90 60 100 80" stroke="rgba(255,0,170,0.1)" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="dragon-dg">
+      <svg viewBox="0 0 160 120" fill="none">
+        <path d="M20 80 Q30 50 50 40 Q70 30 90 35 Q110 30 130 20 Q135 15 140 25 Q130 40 110 45 Q90 50 70 55 Q50 60 40 80Z"
+              fill="none" stroke="rgba(176,68,255,0.1)" stroke-width="1.5"/>
+        <path d="M130 20 L145 10 L140 25" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+        <path d="M20 80 Q10 90 5 100" stroke="rgba(176,68,255,0.08)" stroke-width="1"/>
+        <path d="M40 80 Q35 95 30 105" stroke="rgba(176,68,255,0.06)" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- الهيدر -->
+  <header>
+    <div class="hdr-brand">
+      <div class="hdr-ball">
+        <svg viewBox="0 0 100 100" class="hdr-ball-svg">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(176,68,255,0.15)" stroke-width="2"/>
+          <circle cx="50" cy="50" r="42" fill="rgba(255,255,255,0.03)" stroke="rgba(0,212,255,0.2)" stroke-width="1.5"/>
+          <path d="M50 8 L54 20 L66 16 L62 28 L74 32 L66 40 L74 50 L62 54 L66 66 L54 62 L50 74 L46 62 L34 66 L38 54 L26 50 L34 40 L26 32 L38 28 L34 16 L46 20Z" fill="none" stroke="url(#ballGrad)" stroke-width="1.5" stroke-linejoin="round"/>
+          <polygon points="50,18 58,28 50,38 42,28" fill="rgba(0,212,255,0.12)" stroke="rgba(0,212,255,0.25)" stroke-width="0.8"/>
+          <polygon points="72,38 80,48 72,58 64,48" fill="rgba(176,68,255,0.12)" stroke="rgba(176,68,255,0.25)" stroke-width="0.8"/>
+          <polygon points="50,62 58,52 50,42 42,52" fill="rgba(255,68,204,0.1)" stroke="rgba(255,68,204,0.2)" stroke-width="0.8"/>
+          <polygon points="28,38 36,28 28,18 20,28" fill="rgba(255,180,0,0.1)" stroke="rgba(255,180,0,0.2)" stroke-width="0.8"/>
+          <polygon points="28,62 20,52 28,42 36,52" fill="rgba(0,255,170,0.1)" stroke="rgba(0,255,170,0.2)" stroke-width="0.8"/>
+          <defs>
+            <linearGradient id="ballGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#b044ff"/>
+              <stop offset="50%" stop-color="#00d4ff"/>
+              <stop offset="100%" stop-color="#ff44cc"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="hdr-frame">
+        <div class="hdr-frame-border"></div>
+        <div class="hdr-name">الكورة مع معاملي</div>
+      </div>
+      <div class="hdr-sub">⚡ بث مباشر ⚡</div>
+    </div>
+    <div class="hdr-trophy">
+      <svg viewBox="0 0 100 100" class="trophy-svg">
+        <defs>
+          <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffd700"/>
+            <stop offset="50%" stop-color="#ff8c00"/>
+            <stop offset="100%" stop-color="#ffd700"/>
+          </linearGradient>
+          <linearGradient id="goldGrad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#ffed4a"/>
+            <stop offset="100%" stop-color="#ff8c00"/>
+          </linearGradient>
+        </defs>
+        <!-- قاعدة الكأس -->
+        <rect x="35" y="80" width="30" height="6" rx="2" fill="url(#goldGrad2)" opacity="0.9"/>
+        <rect x="30" y="86" width="40" height="4" rx="2" fill="url(#goldGrad2)" opacity="0.7"/>
+        <rect x="45" y="72" width="10" height="10" rx="2" fill="url(#goldGrad2)"/>
+        <!-- الجسم -->
+        <path d="M30 30 Q30 55 35 65 L65 65 Q70 55 70 30 Q70 15 60 12 Q55 20 50 22 Q45 20 40 12 Q30 15 30 30Z" fill="url(#goldGrad)" opacity="0.95"/>
+        <!-- اليدين -->
+        <path d="M28 40 L20 38 Q18 35 20 33 L28 36" fill="url(#goldGrad)" opacity="0.85"/>
+        <path d="M72 40 L80 38 Q82 35 80 33 L72 36" fill="url(#goldGrad)" opacity="0.85"/>
+        <!-- الكرة الأرضية -->
+        <circle cx="50" cy="35" r="10" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <ellipse cx="50" cy="35" rx="10" ry="3" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+        <line x1="50" y1="25" x2="50" y2="45" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+        <!-- stars -->
+        <circle cx="50" cy="22" r="2" fill="#fff" opacity="0.3"/>
+        <circle cx="50" cy="48" r="2" fill="#fff" opacity="0.3"/>
+      </svg>
+    </div>
+  </header>
+
+  <div class="layout-w">
+    <!-- القائمة الجانبية -->
+    <nav class="side-nav">
+      <a href="#home" class="nav-link active" data-page="home">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/>
+        </svg>
+        <span>الرئيسية</span>
+      </a>
+      <a href="#player" class="nav-link" data-page="player">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M10 8l6 4-6 4V8z" fill="currentColor"/>
+        </svg>
+        <span>المشغل</span>
+      </a>
+      <a href="#vip" class="nav-link vip-link" data-page="vip">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+        </svg>
+        <span>★ VIP</span>
+      </a>
+      <a href="#about" class="nav-link" data-page="about">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>عن الموقع</span>
+      </a>
+    </nav>
+
+    <!-- المحتوى الرئيسي -->
+    <main id="app">
+
+    <!-- الصفحة الرئيسية -->
+    <div class="page" id="page-home">
+
+      <!-- رأس الموقع -->
+      <div class="hero-header">
+        <div class="hero-glow"></div>
+        <div class="hero-date" id="heroDate"></div>
+        <div class="hero-live-count" id="heroLiveCount"></div>
+      </div>
+
+      <!-- قسم المباريات (اليوم فقط) -->
+      <div id="matchesSection">
+        <div id="matchError" class="error-box hidden">
+          <span>⚠️ تعذر تحميل المباريات</span>
+          <button class="retry-btn" onclick="fetchData()">إعادة المحاولة</button>
+        </div>
+        <div id="matchesList"></div>
+      </div>
+
+      <!-- قسم الترتيب -->
+      <div id="standingsSection" class="standings-wrap">
+        <div class="section-header">
+          <span class="sh-icon">🏆</span>
+          <span>ترتيب المجموعات</span>
+        </div>
+        <div id="standingsList" class="standings-grid"></div>
+        <div id="standingsError" class="error-box hidden" style="margin-top:8px">
+          <span>⚠️ تعذر تحميل الترتيب</span>
+          <button class="retry-btn" onclick="fetchStandings()">إعادة المحاولة</button>
+        </div>
+      </div>
+
+      <!-- بطاقة المباراة الموسعة (تظهر عند الضغط) -->
+      <div id="matchDetail" class="match-detail-overlay hidden" onclick="closeDetail(event)">
+        <div class="match-detail-card" id="matchDetailInner"></div>
+      </div>
+
+      <!-- تفاصيل المجموعة الموسعة (تظهر عند الضغط) -->
+      <div id="standsDetail" class="sd-overlay hidden" onclick="closeSD(event)">
+        <div class="sd-card" id="standsDetailInner"></div>
+      </div>
+
+    </div>
+
+    <!-- صفحة المشغل -->
+    <div class="page hidden" id="page-player">
+      <div class="player-portal">
+        <div class="portal-ring ring-1"></div>
+        <div class="portal-ring ring-2"></div>
+        <div class="portal-ring ring-3"></div>
+        <div class="player-container" id="playerContainer">
+          <div id="k-player" class="k-player"></div>
+          <div id="loader" class="loader">
+            <div class="spinner"></div>
+          </div>
+          <div id="liveBadge" class="live-badge">● مباشر</div>
+        </div>
+      </div>
+      <div class="controls-bar">
+        <button id="fullscreenBtn" class="ctrl-btn" title="ملء الشاشة">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" fill="currentColor"/>
+          </svg>
+        </button>
+        <button id="pipBtn" class="ctrl-btn" title="صورة داخل صورة">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="server-info">
+          <span id="channelNamePlayer">—</span>
+          <span class="sep">✦</span>
+          <span id="currentServerName" class="server-name">اختر سيرفر</span>
+        </div>
+        <button id="backToHomeBtn" class="ctrl-btn back-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      <div id="playerServers" class="servers-grid"></div>
+    </div>
+
+    <!-- صفحة VIP -->
+    <div class="page hidden" id="page-vip">
+      <div class="vip-hero">
+        <div class="vip-crown">👑</div>
+        <div class="vip-stars-row">★ ★ ★</div>
+        <h1 class="vip-title">VIP</h1>
+        <p class="vip-subtitle">أقوى سيرفرات البث المباشر — أسرع وأفضل جودة</p>
+        <div class="vip-badges">
+          <span>HD</span>
+          <span>FHD</span>
+          <span>4K</span>
+          <span>HLS</span>
+          <span>بدون تقطيع</span>
+        </div>
+      </div>
+      <div id="vipGrid" class="vip-grid"></div>
+    </div>
+
+    <!-- صفحة عن الموقع -->
+    <div class="page hidden" id="page-about">
+      <div class="section-title">
+        <h1>عن <span class="accent-purple">الكورة مع معاملي</span></h1>
+      </div>
+      <div class="about-content">
+        <div class="about-card glass-card">
+          <p>موقع <strong>الكورة مع معاملي</strong> يقدم أفضل سيرفرات البث المباشر لمباريات كأس العالم 2026 وأهم البطولات الرياضية.</p>
+        </div>
+        <div class="about-card glass-card">
+          <h3>المميزات</h3>
+          <ul>
+            <li>✦ مشغل آمن بدون إعلانات</li>
+            <li>✦ سيرفرات VIP عالية الجودة</li>
+            <li>✦ تحديث دائم للسيرفرات</li>
+          </ul>
+        </div>
+        <div class="about-card glass-card copyright">
+          <p>جميع الحقوق محفوظة © <span class="accent-purple">الكورة مع معاملي</span> 2026</p>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  </main></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
