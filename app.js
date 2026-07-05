@@ -2,8 +2,54 @@
 
 /* ====== WC 2026 DATA (365scores API) ====== */
 var API_GAMES = 'https://webws.365scores.com/web/games/?langId=1&timezoneName=Africa/Cairo&userId=-1&competitions=5930';
-var API_STANDINGS = 'https://webws.365scores.com/web/standings/?langId=1&timezoneName=Africa/Cairo&competitions=5930&seasonNum=25';
+var API_STATS = 'https://webws.365scores.com/web/stats/?langId=1&timezoneName=Africa/Cairo&competitions=5930&top=10&type=goals';
 var _AUTO_REFRESH = null;
+var _COMPETITOR_MAP = {};
+var _TEAM_MAP = {
+  2372:{n:'Germany',s:'GER'}, 2376:{n:'Norway',s:'NOR'}, 2377:{n:'Netherlands',s:'NED'},
+  2378:{n:'Argentina',s:'ARG'}, 2379:{n:'Brazil',s:'BRA'}, 2388:{n:'Canada',s:'CAN'},
+  2389:{n:'USA',s:'USA'}, 2391:{n:'Canada',s:'CAN'}, 5028:{n:'Portugal',s:'POR'},
+  5032:{n:'Switzerland',s:'SWI'}, 5050:{n:'Spain',s:'ESP'}, 5054:{n:'England',s:'ENG'},
+  5061:{n:'France',s:'FRA'}, 5070:{n:'Paraguay',s:'PAR'}, 5093:{n:'Morocco',s:'MAR'},
+  5102:{n:'Senegal',s:'SEN'}, 5106:{n:'Colombia',s:'COL'}, 14650:{n:'Congo DR',s:'DR'},
+  5029:{n:'Uruguay',s:'URU'}, 5030:{n:'Croatia',s:'CRO'}, 5031:{n:'Belgium',s:'BEL'},
+  5033:{n:'Denmark',s:'DEN'}, 5034:{n:'Sweden',s:'SWE'}, 5035:{n:'Austria',s:'AUT'},
+  5036:{n:'Serbia',s:'SRB'}, 5037:{n:'Czechia',s:'CZE'}, 5038:{n:'Poland',s:'POL'},
+  5039:{n:'Wales',s:'WAL'}, 5040:{n:'Scotland',s:'SCO'}, 5041:{n:'Ireland',s:'IRL'},
+  5042:{n:'Hungary',s:'HUN'}, 5043:{n:'Romania',s:'ROU'}, 5044:{n:'Slovakia',s:'SVK'},
+  5045:{n:'Slovenia',s:'SVN'}, 5046:{n:'Albania',s:'ALB'}, 5047:{n:'Greece',s:'GRE'},
+  5048:{n:'Finland',s:'FIN'}, 5049:{n:'Iceland',s:'ISL'}, 5051:{n:'Italy',s:'ITA'},
+  5052:{n:'N. Ireland',s:'NIR'}, 5053:{n:'Israel',s:'ISR'}, 5055:{n:'Wales',s:'WAL'},
+  5056:{n:'Bosnia',s:'BIH'}, 5057:{n:'Montenegro',s:'MNE'}, 5058:{n:'North Macedonia',s:'MKD'},
+  5059:{n:'Georgia',s:'GEO'}, 5060:{n:'Kazakhstan',s:'KAZ'}, 5062:{n:'Tunisia',s:'TUN'},
+  5063:{n:'Algeria',s:'ALG'}, 5064:{n:'Nigeria',s:'NGA'}, 5065:{n:'Cameroon',s:'CMR'},
+  5066:{n:'Ghana',s:'GHA'}, 5067:{n:'Ivory Coast',s:'CIV'}, 5068:{n:'Mali',s:'MLI'},
+  5069:{n:'Burkina Faso',s:'BFA'}, 5071:{n:'Chile',s:'CHI'}, 5072:{n:'Peru',s:'PER'},
+  5073:{n:'Ecuador',s:'ECU'}, 5074:{n:'Bolivia',s:'BOL'}, 5075:{n:'Venezuela',s:'VEN'},
+  5076:{n:'Japan',s:'JPN'}, 5077:{n:'S. Korea',s:'KOR'}, 5078:{n:'Australia',s:'AUS'},
+  5079:{n:'Saudi Arabia',s:'KSA'}, 5080:{n:'Iran',s:'IRN'}, 5081:{n:'Iraq',s:'IRA'},
+  5082:{n:'Qatar',s:'QAT'}, 5083:{n:'UAE',s:'UAE'}, 5084:{n:'China',s:'CHN'},
+  5085:{n:'Oman',s:'OMA'}, 5086:{n:'Jordan',s:'JOR'}, 5087:{n:'Uzbekistan',s:'UZB'},
+  5088:{n:'Syria',s:'SYR'}, 5089:{n:'Thailand',s:'THA'}, 5090:{n:'Vietnam',s:'VIE'},
+  5091:{n:'India',s:'IND'}, 5092:{n:'Indonesia',s:'IDN'}, 5094:{n:'Egypt',s:'EGY'},
+  5095:{n:'South Africa',s:'SOU'}, 5096:{n:'Cape Verde',s:'CPV'}, 5097:{n:'Angola',s:'ANG'},
+  5098:{n:'Gabon',s:'GAB'}, 5099:{n:'Guinea',s:'GUI'}, 5100:{n:'Congo',s:'CON'},
+  5101:{n:'Zambia',s:'ZAM'}, 5103:{n:'Tanzania',s:'TAN'}, 5104:{n:'Burundi',s:'BDI'},
+  5105:{n:'Rwanda',s:'RWA'}, 5107:{n:'Mexico',s:'MEX'}, 5108:{n:'Panama',s:'PAN'},
+  5109:{n:'Honduras',s:'HON'}, 5110:{n:'Costa Rica',s:'CRC'}, 5111:{n:'Jamaica',s:'JAM'},
+  5112:{n:'Haiti',s:'HAI'}, 5113:{n:'Trinidad',s:'TRI'}, 5114:{n:'Cuba',s:'CUB'},
+  5115:{n:'El Salvador',s:'SLV'}, 5116:{n:'Guatemala',s:'GUA'}, 5117:{n:'Nicaragua',s:'NCA'},
+  5118:{n:'New Zealand',s:'NEW'}, 5119:{n:'Curaçao',s:'CUR'}, 5120:{n:'Bosnia',s:'BIH'},
+  2380:{n:'Poland',s:'POL'}, 2381:{n:'Serbia',s:'SRB'}, 2382:{n:'Czechia',s:'CZE'},
+  2383:{n:'Wales',s:'WAL'}, 2384:{n:'Scotland',s:'SCO'}, 2385:{n:'Austria',s:'AUT'},
+  2386:{n:'Hungary',s:'HUN'}, 2387:{n:'Israel',s:'ISR'}, 2390:{n:'Iceland',s:'ISL'},
+  2392:{n:'Albania',s:'ALB'}, 2393:{n:'Finland',s:'FIN'}, 2394:{n:'Greece',s:'GRE'},
+  14640:{n:'Tunisia',s:'TUN'}, 14641:{n:'Algeria',s:'ALG'}, 14642:{n:'Nigeria',s:'NGA'},
+  14643:{n:'Cameroon',s:'CMR'}, 14644:{n:'Ghana',s:'GHA'}, 14645:{n:'Senegal',s:'SEN'},
+  14646:{n:'Morocco',s:'MAR'}, 14647:{n:'Egypt',s:'EGY'}, 14648:{n:'Ivory Coast',s:'CIV'},
+  14649:{n:'South Africa',s:'SOU'}, 14651:{n:'Mali',s:'MLI'}
+};
+var _TOP_SCORERS = [];
 
 function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
@@ -16,15 +62,13 @@ function parseStartTime(g) {
   return new Date(g.startTime);
 }
 
+function cairoDateStr(d) {
+  return d.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' });
+}
+
 function isToday(g) {
   if (!g || !g.startTime) return false;
-  var gameDate = parseStartTime(g);
-  var now = new Date();
-  var nowUtcMs = now.getTime() - now.getTimezoneOffset() * 60000;
-  var egyptNow = new Date(nowUtcMs + 2 * 3600000);
-  return gameDate.getUTCFullYear() === egyptNow.getUTCFullYear() &&
-         gameDate.getUTCMonth() === egyptNow.getUTCMonth() &&
-         gameDate.getUTCDate() === egyptNow.getUTCDate();
+  return cairoDateStr(parseStartTime(g)) === cairoDateStr(new Date());
 }
 
 function statusGroupToType(sg) {
@@ -59,13 +103,144 @@ function getFlag(sym) {
   return code ? '<img class="fi" src="https://flagcdn.com/24x18/' + code + '.png" alt="">' : '';
 }
 function teamHTML(comp) {
-  if (!comp) return '<span class="mc-n">—</span>';
+  if (!comp) return '<span class="md-n">—</span>';
   var name = comp.name || '—';
-  var f = getFlag(comp.symbolicName);
-  return f + '<span class="mc-n">' + name + '</span>';
+  var code = comp.symbolicName && _FLAG_ISO2[comp.symbolicName];
+  var f = code ? '<img class="md-f" src="https://flagcdn.com/36x27/' + code + '.png" alt="">' : '';
+  return f + '<span class="md-n">' + name + '</span>';
+}
+
+/* ====== GAME DETAIL FETCH ====== */
+function fetchGameDetail(gameId) {
+  var url = 'https://webws.365scores.com/web/game/?langId=1&timezoneName=Africa/Cairo&userId=-1&gameId=' + gameId;
+  return fetch(url).then(function(r) { return r.json(); });
+}
+
+/* ====== RENDER EVENTS ====== */
+function renderEvents(events, homeId, awayId, members) {
+  var memberMap = {};
+  if (members) {
+    members.forEach(function(m) { memberMap[m.id] = m; });
+  }
+
+  function getPlayerName(pid) {
+    if (!pid) return '';
+    var m = memberMap[pid];
+    return m ? (m.shortName || m.name || '') : '';
+  }
+
+  var html = '<div class="md-section md-events-section"><div class="md-section-title"><span>⚡</span> أحداث المباراة</div><div class="md-events">';
+  var times = [];
+  events.forEach(function(e) { if (times.indexOf(e.gameTime) === -1) times.push(e.gameTime); });
+  times.sort(function(a,b) { return a - b; });
+
+  var goalCounts = {};
+  events.forEach(function(e) {
+    if (e.eventType && (e.eventType.name === 'Goal' || e.eventType.id === 1)) {
+      goalCounts[e.competitorId] = (goalCounts[e.competitorId] || 0) + 1;
+    }
+  });
+
+  times.forEach(function(t) {
+    events.filter(function(e) { return e.gameTime === t; }).sort(function(a,b) { return a.order - b.order; }).forEach(function(e) {
+      var isHome = e.competitorId === homeId;
+      var timeStr = e.gameTimeDisplay || t + "'";
+      var icon = '', desc = '';
+      var en = e.eventType;
+
+      if (!en) return;
+
+      if (en.name === 'Goal' || en.id === 1) {
+        icon = '<span class="ev-icon ev-goal">⚽</span>';
+        var g = en.subTypeName === 'Penalty Goal' ? ' (pen.)' : (en.subTypeName === 'Own Goal' ? ' (o.g.)' : '');
+        var scorer = getPlayerName(e.playerId);
+        var assist = e.extraPlayers && e.extraPlayers[0] ? getPlayerName(e.extraPlayers[0]) : '';
+        desc = scorer + g;
+        if (assist) desc += ' ( ' + assist + ' )';
+      } else if (en.name === 'Yellow Card' || en.id === 2) {
+        icon = '<span class="ev-icon ev-yellow">🟨</span>';
+        desc = getPlayerName(e.playerId);
+      } else if (en.name === 'Red Card' || en.id === 3) {
+        icon = '<span class="ev-icon ev-red">🟥</span>';
+        desc = getPlayerName(e.playerId);
+      } else if (en.name.indexOf('Substitution') >= 0 || en.id === 1000) {
+        icon = '<span class="ev-icon ev-sub">🔄</span>';
+        var pIn = getPlayerName(e.playerId);
+        var pOut = e.extraPlayers && e.extraPlayers[0] ? getPlayerName(e.extraPlayers[0]) : '';
+        desc = pIn + (pOut ? ' ← ' + pOut : '');
+      } else if (en.name === 'Missed Penalty' || en.id === 7) {
+        icon = '<span class="ev-icon ev-miss">❌</span>';
+        desc = getPlayerName(e.playerId);
+      }
+
+      if (desc) {
+        html += '<div class="md-event ' + (isHome ? 'ev-home' : 'ev-away') + '"><span class="ev-time">' + timeStr + '</span>' + icon + '<span class="ev-desc">' + desc + '</span></div>';
+      }
+    });
+  });
+
+  html += '</div></div>';
+  return html;
+}
+
+/* ====== RENDER LINEUPS ====== */
+function renderLineupsTeam(competitor, members) {
+  var lineups = competitor.lineups;
+  if (!lineups || !lineups.members || lineups.members.length === 0) return '';
+
+  var memberMap = {};
+  if (members) { members.forEach(function(m) { memberMap[m.id] = m; }); }
+
+  var formation = lineups.formation || '';
+  var teamName = competitor.name || '—';
+  var flag = getFlag(competitor.symbolicName);
+
+  var starters = lineups.members.filter(function(m) { return m.status === 1 || m.statusText === 'Starting'; });
+  var subs = lineups.members.filter(function(m) { return m.status === 2 || (m.statusText && m.statusText.indexOf('Substitute') >= 0); });
+
+  function playerRow(m) {
+    var p = memberMap[m.id];
+    var name = p ? (p.shortName || p.name) : '';
+    var num = p ? (p.jerseyNumber || '') : '';
+    var rank = m.ranking ? '<span class="lu-rating">' + m.ranking.toFixed(1) + '</span>' : '';
+    return '<div class="lu-player"><span class="lu-num">' + num + '</span><span class="lu-name">' + name + '</span>' + rank + '</div>';
+  }
+
+  var html = '<div class="md-section md-lineups-section"><div class="md-section-title"><span>👥</span> تشكيل ' + teamName + (formation ? ' — ' + formation : '') + '</div>';
+  html += '<div class="lu-grid"><div class="lu-col"><div class="lu-label">' + flag + ' التشكيلة الأساسية</div>';
+  starters.forEach(function(m) { html += playerRow(m); });
+  html += '</div>';
+  if (subs.length > 0) {
+    html += '<div class="lu-col"><div class="lu-label">🔄 البدلاء</div>';
+    subs.forEach(function(m) { html += playerRow(m); });
+    html += '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
+/* ====== RENDER VENUE ====== */
+function renderVenue(venue) {
+  if (!venue || !venue.name) return '';
+  var parts = [];
+  if (venue.name) parts.push('🏟️ ' + venue.name);
+  if (venue.capacity) parts.push('👥 السعة: ' + venue.capacity.toLocaleString());
+  if (venue.attendance) parts.push('📊 الحضور: ' + venue.attendance.toLocaleString());
+  return '<div class="md-section md-venue-section"><div class="md-section-title"><span>📍</span> الملعب</div><div class="md-venue">' + parts.join(' • ') + '</div></div>';
+}
+
+/* ====== RENDER OFFICIALS ====== */
+function renderOfficials(officials) {
+  if (!officials || officials.length === 0) return '';
+  var names = officials.map(function(o) { return o.name || ''; }).filter(function(n) { return n; });
+  if (names.length === 0) return '';
+  return '<div class="md-section md-officials-section"><div class="md-section-title"><span>🔰</span> الحكام</div><div class="md-officials">' + names.join(' • ') + '</div></div>';
 }
 
 /* ====== MAIN FETCH ====== */
+var _ALL_GAMES = [];
+var _CURRENT_VIEW = 'today';
+
 function fetchData() {
   var list = document.getElementById('matchesList');
   var err = document.getElementById('matchError');
@@ -75,11 +250,98 @@ function fetchData() {
 
   fetch(API_GAMES).then(function(r) { return r.json(); }).then(function(data) {
     list.innerHTML = '';
-    renderToday((data.games || []));
+    _ALL_GAMES = data.games || [];
+
+    /* build competitor map for flag lookup */
+    _ALL_GAMES.forEach(function(g) {
+      if (g.homeCompetitor && g.homeCompetitor.id) {
+        _COMPETITOR_MAP[g.homeCompetitor.id] = { symbolicName: g.homeCompetitor.symbolicName, name: g.homeCompetitor.name };
+      }
+      if (g.awayCompetitor && g.awayCompetitor.id) {
+        _COMPETITOR_MAP[g.awayCompetitor.id] = { symbolicName: g.awayCompetitor.symbolicName, name: g.awayCompetitor.name };
+      }
+    });
+
+    renderFeatured(_ALL_GAMES);
+    renderToday(_ALL_GAMES);
+    renderKnockout(_ALL_GAMES);
+    if (_CURRENT_VIEW === 'all') switchView('all');
+    fetchTopScorers();
   }).catch(function(e) {
     list.innerHTML = '';
     if (err) err.classList.remove('hidden');
   });
+}
+
+/* ====== VIEW TOGGLE ====== */
+function switchView(view) {
+  var todayBtn = document.getElementById('viewTodayBtn');
+  var allBtn = document.getElementById('viewAllBtn');
+  var matchList = document.getElementById('matchesList');
+  var scheduleList = document.getElementById('scheduleList');
+  if (!matchList || !scheduleList) return;
+
+  [todayBtn, allBtn].forEach(function(b) { if (b) b.classList.remove('active'); });
+  matchList.classList.add('hidden');
+  scheduleList.classList.add('hidden');
+
+  if (view === 'today') {
+    if (todayBtn) todayBtn.classList.add('active');
+    matchList.classList.remove('hidden');
+  } else {
+    if (allBtn) allBtn.classList.add('active');
+    scheduleList.classList.remove('hidden');
+  }
+}
+
+/* ====== SCHEDULE VIEW ====== */
+function renderSchedule(games) {
+  var el = document.getElementById('scheduleList');
+  if (!el) return;
+
+  var rounds = {};
+  games.forEach(function(g) {
+    var key = g.stageNum || 1;
+    var label = roundLabel(g) || 'مرحلة ' + key;
+    if (!rounds[key]) rounds[key] = { label: label, games: [] };
+    rounds[key].games.push(g);
+  });
+
+  var keys = Object.keys(rounds).sort(function(a,b) { return parseInt(a) - parseInt(b); });
+  var html = '';
+  keys.forEach(function(k) {
+    var round = rounds[k];
+    round.games.sort(function(a,b) { return parseStartTime(a) - parseStartTime(b); });
+    html += '<div class="schedule-round"><div class="schedule-round-title">' + round.label + ' (' + round.games.length + ' مباراة)</div><div class="schedule-grid">';
+    round.games.forEach(function(g) {
+      var hComp = g.homeCompetitor;
+      var aComp = g.awayCompetitor;
+      var hName = (hComp && hComp.name) || '—';
+      var aName = (aComp && aComp.name) || '—';
+      var hScore = hComp ? Math.round(hComp.score) : void 0;
+      var aScore = aComp ? Math.round(aComp.score) : void 0;
+      var hs = isNaN(hScore) ? 0 : hScore, as = isNaN(aScore) ? 0 : aScore;
+      var d = parseStartTime(g);
+      var dateStr = d.toLocaleDateString('ar-EG', { weekday:'short', day:'numeric', month:'short', timeZone: 'Africa/Cairo' });
+      var timeStr = formatTime12(d);
+      var type = statusGroupToType(g.statusGroup);
+      var scoreStr, scoreCls;
+      if (type === 'finished') {
+        scoreStr = hs + '-' + as;
+        scoreCls = 'sm-score';
+      } else if (type === 'live') {
+        scoreStr = hs + '-' + as;
+        scoreCls = 'sm-score live-s';
+      } else {
+        scoreStr = 'VS';
+        scoreCls = 'sm-vs';
+      }
+      html += '<div class="schedule-match" onclick="showDetail(g_show' + g.id + ', \'' + type + '\')"><div class="sm-date">' + dateStr + '</div><div class="sm-time">' + timeStr + '</div><div class="sm-teams"><span class="sm-team sm-home">' + getFlag(hComp && hComp.symbolicName) + '<span class="sm-n">' + hName + '</span></span><span class="' + scoreCls + '">' + scoreStr + '</span><span class="sm-team sm-away"><span class="sm-n">' + aName + '</span>' + getFlag(aComp && aComp.symbolicName) + '</span></div></div>';
+      window['g_show' + g.id] = g;
+    });
+    html += '</div></div>';
+  });
+  el.innerHTML = html || '<div class="empty-day"><span>لا توجد مباريات</span></div>';
 }
 
 function renderToday(games) {
@@ -135,38 +397,96 @@ function renderToday(games) {
 function buildCard(g, type) {
   var card = document.createElement('div');
   card.className = 'mc mc-' + type;
-  card.setAttribute('data-game', JSON.stringify(g));
 
   var hComp = g.homeCompetitor;
   var aComp = g.awayCompetitor;
   var hName = (hComp && hComp.name) || '—';
   var aName = (aComp && aComp.name) || '—';
-  var hScore = hComp ? Math.round(hComp.score) : 0;
-  var aScore = aComp ? Math.round(aComp.score) : 0;
+      var hScore = hComp && hComp.score != null && hComp.score >= 0 ? Math.round(hComp.score) : void 0;
+      var aScore = aComp && aComp.score != null && aComp.score >= 0 ? Math.round(aComp.score) : void 0;
 
-  var scoreHTML, badgeHTML;
+  var hFlag = getFlag(hComp && hComp.symbolicName);
+  var aFlag = getFlag(aComp && aComp.symbolicName);
+  var hRank = hComp && hComp.rankings && hComp.rankings[0] ? '<span class="mc-rank">#' + hComp.rankings[0].position + '</span>' : '';
+  var aRank = aComp && aComp.rankings && aComp.rankings[0] ? '<span class="mc-rank">#' + aComp.rankings[0].position + '</span>' : '';
+  var hRed = hComp && hComp.redCards > 0 ? '<span class="mc-red">🟥</span>' : '';
+  var aRed = aComp && aComp.redCards > 0 ? '<span class="mc-red">🟥</span>' : '';
+
+  var d = parseStartTime(g);
+  var dateStr = d.toLocaleDateString('ar-EG', { weekday:'short', day:'numeric', month:'short', timeZone: 'Africa/Cairo' });
+
+  var badgeHTML, extraClass = '', scoreHTML;
   if (type === 'live') {
     var et = g.gameTimeDisplay || '';
-    scoreHTML = '<span class="mc-score live-s">' + hScore + ' - ' + aScore + '</span>';
-    badgeHTML = '<span class="mc-badge b-live"><span class="live-badge-dot"></span> جاريه الان <span class="live-time">' + et + '</span></span>';
+    badgeHTML = '<span class="mc-badge b-live"><span class="live-badge-dot"></span> ' + et + '</span>';
+    extraClass = ' live-s';
+    scoreHTML = '<div class="mc-score-wrap live-s"><span class="mc-score">' + (isNaN(hScore) ? 0 : hScore) + '</span><span class="mc-score-dash">-</span><span class="mc-score">' + (isNaN(aScore) ? 0 : aScore) + '</span></div>';
   } else if (type === 'finished') {
-    scoreHTML = '<span class="mc-score">' + hScore + ' - ' + aScore + '</span>';
     badgeHTML = '<span class="mc-badge b-end">انتهت</span>';
+    if (g.gameTime && g.gameTime > 90) badgeHTML += '<span class="mc-extra">⚡ ET</span>';
+    scoreHTML = '<div class="mc-score-wrap"><span class="mc-score">' + (isNaN(hScore) ? 0 : hScore) + '</span><span class="mc-score-dash">-</span><span class="mc-score">' + (isNaN(aScore) ? 0 : aScore) + '</span></div>';
   } else {
-    var d = parseStartTime(g);
     var t = formatTime12(d);
-    scoreHTML = '<span class="mc-score mc-vs">VS</span>';
     badgeHTML = '<span class="mc-badge b-up">' + t + '</span>';
+    scoreHTML = '<div class="mc-score-wrap mc-vs-wrap"><span class="mc-vs-text">VS</span></div>';
   }
 
-  card.innerHTML = '<div class="mc-row1"><span class="mc-round">' + roundLabel(g) + '</span>' + badgeHTML + '</div><div class="mc-row2"><div class="mc-t">' + teamHTML(hComp) + '</div>' + scoreHTML + '<div class="mc-t">' + teamHTML(aComp) + '</div></div>';
+  card.innerHTML = '<div class="mc-hdr"><span class="mc-round">' + roundLabel(g) + '</span><span class="mc-date">' + dateStr + '</span>' + badgeHTML + '</div>' +
+    '<div class="mc-body">' +
+      '<div class="mc-team mc-home">' + hFlag + '<span class="mc-n">' + hName + '</span>' + hRank + hRed + '</div>' +
+      scoreHTML +
+      '<div class="mc-team mc-away">' + aFlag + '<span class="mc-n">' + aName + '</span>' + aRank + aRed + '</div>' +
+    '</div>';
 
   card.onclick = function() { showDetail(g, type); };
 
   return card;
 }
 
-/* ====== MATCH DETAIL OVERLAY ====== */
+/* ====== RENDER GOAL SCORERS ====== */
+function renderGoalScorers(events, homeId, awayId, members) {
+  var memberMap = {};
+  if (members) { members.forEach(function(m) { memberMap[m.id] = m; }); }
+
+  function getName(pid) {
+    if (!pid) return '';
+    var m = memberMap[pid];
+    return m ? (m.shortName || m.name || '') : '';
+  }
+
+  var homeGoals = [], awayGoals = [];
+  var goalTypes = { 1: true, '1': true };
+  events.forEach(function(e) {
+    if (e.eventType && (e.eventType.name === 'Goal' || goalTypes[e.eventType.id])) {
+      var goalInfo = {
+        time: e.gameTimeDisplay || e.gameTime + "'",
+        scorer: getName(e.playerId),
+        type: e.eventType.subTypeName || '',
+        assist: e.extraPlayers && e.extraPlayers[0] ? getName(e.extraPlayers[0]) : ''
+      };
+      if (e.competitorId === homeId) homeGoals.push(goalInfo);
+      else awayGoals.push(goalInfo);
+    }
+  });
+
+  var html = '<div class="md-section md-scorers-section"><div class="md-section-title"><span>⚽</span> الهدافون</div><div class="md-scorers-list">';
+  html += '<div class="md-scorers-col"><div class="md-scorers-col-title"></div>';
+  homeGoals.forEach(function(g) {
+    var typeLabel = g.type === 'Penalty Goal' ? ' (pen)' : g.type === 'Own Goal' ? ' (o.g.)' : '';
+    html += '<div class="md-scorer"><span class="md-scorer-time">' + g.time + '</span><span class="md-scorer-icon">⚽</span><span class="md-scorer-name">' + g.scorer + typeLabel + '</span></div>';
+  });
+  if (homeGoals.length === 0) html += '<div class="md-scorer" style="opacity:0.4">—</div>';
+  html += '</div>';
+  html += '<div class="md-scorers-col"><div class="md-scorers-col-title"></div>';
+  awayGoals.forEach(function(g) {
+    var typeLabel = g.type === 'Penalty Goal' ? ' (pen)' : g.type === 'Own Goal' ? ' (o.g.)' : '';
+    html += '<div class="md-scorer"><span class="md-scorer-icon">⚽</span><span class="md-scorer-name">' + g.scorer + typeLabel + '</span><span class="md-scorer-time">' + g.time + '</span></div>';
+  });
+  if (awayGoals.length === 0) html += '<div class="md-scorer" style="opacity:0.4">—</div>';
+  html += '</div></div></div>';
+
+  return html;
+}
 function showDetail(g, type) {
   var ov = document.getElementById('matchDetail');
   var inner = document.getElementById('matchDetailInner');
@@ -176,20 +496,87 @@ function showDetail(g, type) {
   var aComp = g.awayCompetitor;
   var hName = (hComp && hComp.name) || '—';
   var aName = (aComp && aComp.name) || '—';
-  var hScore = hComp ? Math.round(hComp.score) : 0;
-  var aScore = aComp ? Math.round(aComp.score) : 0;
+  var hScore = hComp && hComp.score != null ? Math.round(hComp.score) : void 0;
+  var aScore = aComp && aComp.score != null ? Math.round(aComp.score) : void 0;
+
+  var hRank = hComp && hComp.rankings && hComp.rankings[0] ? '<span class="md-rank">FIFA #' + hComp.rankings[0].position + '</span>' : '';
+  var aRank = aComp && aComp.rankings && aComp.rankings[0] ? '<span class="md-rank">FIFA #' + aComp.rankings[0].position + '</span>' : '';
 
   var scoreBig;
-  if (type === 'upcoming') {
+  if (type === 'upcoming' || type === 'notstarted') {
     var d = parseStartTime(g);
     scoreBig = '<div class="md-time-big">' + formatTime12(d) + '</div><div class="md-date-big">' + d.toLocaleDateString('ar-EG', { weekday:'long', month:'long', day:'numeric', timeZone: 'Africa/Cairo' }) + '</div>';
   } else {
-    scoreBig = '<div class="md-score-big">' + hScore + ' - ' + aScore + '</div>';
+    var hs = isNaN(hScore) ? 0 : hScore;
+    var as = isNaN(aScore) ? 0 : aScore;
+    scoreBig = '<div class="md-score-big">' + hs + ' - ' + as + '</div>';
   }
 
-  inner.innerHTML = '<div class="md-close" onclick="document.getElementById(\'matchDetail\').classList.add(\'hidden\')">✕</div><div class="md-round">' + roundLabel(g) + '</div><div class="md-teams"><div class="md-t">' + teamHTML(hComp) + '</div>' + scoreBig + '<div class="md-t">' + teamHTML(aComp) + '</div></div><div class="md-actions"><button class="md-btn md-btn-watch" onclick="watchMatch()">▶ شاهد المباراة</button></div>';
+  var statusInfo = '';
+  if (type === 'finished' && g.statusText && g.statusText !== 'Ended') {
+    statusInfo = '<div class="md-status-info">' + g.statusText + ' (بعد ' + Math.round(g.gameTime || 90) + ' دقيقة)</div>';
+  }
+  if (type === 'live') {
+    statusInfo = '<div class="md-status-info live">' + g.gameTimeDisplay + ' — ' + (g.statusText || 'جارية') + '</div>';
+  }
+
+  inner.innerHTML = '<div class="md-close" onclick="document.getElementById(\'matchDetail\').classList.add(\'hidden\')">✕</div>' +
+    '<div class="md-round">' + roundLabel(g) + '</div>' +
+    '<div class="md-teams">' +
+      '<div class="md-t">' + teamHTML(hComp) + hRank + '</div>' +
+      scoreBig +
+      '<div class="md-t">' + teamHTML(aComp) + aRank + '</div>' +
+    '</div>' + statusInfo +
+    '<div class="md-actions"><button class="md-btn md-btn-watch" onclick="watchMatch()">▶ شاهد المباراة</button></div>' +
+    '<div id="mdGoalScorers" class="md-goal-scorers-section"></div>' +
+    '<div id="mdDetailSection" class="md-detail-section"><div class="ldr"><span class="ldr-spin"></span><span>جاري تحميل التفاصيل...</span></div></div>';
 
   ov.classList.remove('hidden');
+
+  if (g.id && (type === 'finished' || type === 'live')) {
+    var gameId = g.id;
+    fetchGameDetail(gameId).then(function(data) {
+      var game = data && data.game;
+      if (!game) {
+        var de = document.getElementById('mdDetailSection');
+        if (de) de.innerHTML = '';
+        return;
+      }
+
+      var html = '';
+      var hCompDetail = game.homeCompetitor;
+      var aCompDetail = game.awayCompetitor;
+      var members = game.members;
+
+      if (game.events && game.events.length > 2) {
+        var gsEl = document.getElementById('mdGoalScorers');
+        if (gsEl) gsEl.innerHTML = renderGoalScorers(game.events, hCompDetail.id, aCompDetail.id, members);
+      }
+
+      if (game.events && game.events.length > 2) {
+        html += renderEvents(game.events, hCompDetail.id, aCompDetail.id, members);
+      }
+      if (hCompDetail.lineups && hCompDetail.lineups.members && hCompDetail.lineups.members.length > 0) {
+        html += renderLineupsTeam(hCompDetail, members);
+        html += renderLineupsTeam(aCompDetail, members);
+      }
+      if (game.venue) {
+        html += renderVenue(game.venue);
+      }
+      if (game.officials) {
+        html += renderOfficials(game.officials);
+      }
+
+      var de = document.getElementById('mdDetailSection');
+      if (de) de.innerHTML = html || '<div class="md-no-detail">لا توجد تفاصيل إضافية</div>';
+    }).catch(function() {
+      var de = document.getElementById('mdDetailSection');
+      if (de) de.innerHTML = '';
+    });
+  } else {
+    var de = document.getElementById('mdDetailSection');
+    if (de) de.innerHTML = '';
+  }
 }
 
 function closeDetail(e) {
@@ -201,98 +588,394 @@ function watchMatch() {
   navigateTo('player');
 }
 
-/* ====== STANDINGS ====== */
-function fetchStandings() {
-  var el = document.getElementById('standingsList');
-  var err = document.getElementById('standingsError');
+/* ====== KNOCKOUT ROUNDS (كل الأدوار الإقصائية) ====== */
+function renderKnockout(games) {
+  var el = document.getElementById('koList');
   if (!el) return;
-  el.innerHTML = '<div class="ldr"><span class="ldr-spin"></span></div>';
-  if (err) err.classList.add('hidden');
+  _KO_GAMES_CACHE = games;
 
-  fetch(API_STANDINGS).then(function(r) { return r.json(); }).then(function(d) {
-    el.innerHTML = '';
-    var s = d.standings && d.standings[0];
-    if (s && s.groups && s.rows) {
-      __standingsRows = s.rows;
-      renderStands(s.groups, s.rows);
-    }
-  }).catch(function(e) {
-    el.innerHTML = '';
-    if (err) err.classList.remove('hidden');
+  var rounds = { 3: [], 4: [], 5: [], 6: [] };
+  var labels = { 3: 'دور 16', 4: 'ربع النهائي', 5: 'نصف النهائي', 6: '🏆 النهائي' };
+
+  games.forEach(function(g) {
+    var sn = g.stageNum;
+    if (rounds[sn]) rounds[sn].push(g);
   });
-}
 
-var _GROUPS_DATA = [];
-var GROUP_LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  var koSection = document.getElementById('knockoutSection');
+  var hasAny = false;
+  for (var k in rounds) { if (rounds[k].length > 0) hasAny = true; }
 
-function renderStands(groups, rows) {
-  groups.sort(function(a,b) { return a.num - b.num; });
-  _GROUPS_DATA = groups;
-  var el = document.getElementById('standingsList');
+  if (!hasAny) {
+    if (koSection) koSection.style.display = 'none';
+    return;
+  }
+  if (koSection) koSection.style.display = '';
 
-  groups.forEach(function(g, idx) {
-    var groupRows = rows.filter(function(r) { return r.groupNum === g.num; });
-    groupRows.sort(function(a,b) { return (b.points||0) - (a.points||0) || (b.ratio||0) - (a.ratio||0); });
+  el.innerHTML = '';
+  var roundKeys = [3, 4, 5, 6];
 
-    var letter = (g.num >= 1 && g.num <= 12) ? GROUP_LETTERS[g.num - 1] : '';
-    var html = '<div class="st-grp" onclick="showSD(' + idx + ')"><div class="st-grp-title">المجموعة ' + letter + ' <span class="st-expand-icon">▼</span></div>';
-    html += '<table class="st-tbl"><thead><tr><th></th><th class="st-tl">الفريق</th><th>ل</th><th>ف</th><th>ت</th><th>خ</th><th>+/-</th><th class="st-pts-h">ن</th></tr></thead><tbody>';
-    groupRows.forEach(function(r, i) {
-      var name = (r.competitor && r.competitor.name) || '—';
-      var cls = i < 2 ? 'st-q' : '';
-      html += '<tr class="' + cls + '"><td class="st-r">' + (i+1) + '</td><td class="st-tl">' + getFlag(r.competitor && r.competitor.symbolicName) + ' ' + name + '</td><td>' + (r.gamePlayed||0) + '</td><td>' + (r.gamesWon||0) + '</td><td>' + (r.gamesEven||0) + '</td><td>' + (r.gamesLost||0) + '</td><td class="st-gd">' + (r.ratio > 0 ? '+' : '') + (r.ratio||0) + '</td><td class="st-pts"><strong>' + (r.points||0) + '</strong></td></tr>';
+  roundKeys.forEach(function(rk) {
+    var rg = rounds[rk];
+    if (rg.length === 0) return;
+
+    rg.sort(function(a,b) { return parseStartTime(a) - parseStartTime(b); });
+
+    var h = document.createElement('div');
+    h.className = 'sec-label';
+    h.innerHTML = '<span>' + labels[rk] + '</span><span class="sec-count">' + rg.length + '</span>';
+    el.appendChild(h);
+
+    rg.forEach(function(g) {
+      var hComp = g.homeCompetitor;
+      var aComp = g.awayCompetitor;
+      var hName = (hComp && hComp.name) || '?';
+      var aName = (aComp && aComp.name) || '?';
+      var hScore = hComp ? Math.round(hComp.score) : void 0;
+      var aScore = aComp ? Math.round(aComp.score) : void 0;
+      var type = statusGroupToType(g.statusGroup);
+      var d = parseStartTime(g);
+      var dateStr = d.toLocaleDateString('ar-EG', { weekday:'short', day:'numeric', month:'short', timeZone: 'Africa/Cairo' });
+
+      var card = document.createElement('div');
+      card.className = 'mc mc-' + type;
+
+      var hFlag = getFlag(hComp && hComp.symbolicName);
+      var aFlag = getFlag(aComp && aComp.symbolicName);
+
+      var badgeHTML, scoreHTML;
+      if (type === 'live') {
+        badgeHTML = '<span class="mc-badge b-live"><span class="live-badge-dot"></span> ' + (g.gameTimeDisplay || '') + '</span>';
+        scoreHTML = '<div class="mc-score-wrap live-s"><span class="mc-score">' + (isNaN(hScore) ? 0 : hScore) + '</span><span class="mc-score-dash">-</span><span class="mc-score">' + (isNaN(aScore) ? 0 : aScore) + '</span></div>';
+      } else if (type === 'finished') {
+        badgeHTML = '<span class="mc-badge b-end">انتهت</span>';
+        scoreHTML = '<div class="mc-score-wrap"><span class="mc-score">' + (isNaN(hScore) ? 0 : hScore) + '</span><span class="mc-score-dash">-</span><span class="mc-score">' + (isNaN(aScore) ? 0 : aScore) + '</span></div>';
+      } else {
+        var timeStr = formatTime12(d);
+        badgeHTML = '<span class="mc-badge b-up">' + timeStr + '</span>';
+        scoreHTML = '<div class="mc-score-wrap mc-vs-wrap"><span class="mc-vs-text">VS</span></div>';
+      }
+
+      card.innerHTML =
+        '<div class="mc-hdr"><span class="mc-round">' + labels[rk] + '</span><span class="mc-date">' + dateStr + '</span>' + badgeHTML + '</div>' +
+        '<div class="mc-body">' +
+          '<div class="mc-team mc-home">' + hFlag + '<span class="mc-n">' + hName + '</span></div>' +
+          scoreHTML +
+          '<div class="mc-team mc-away">' + aFlag + '<span class="mc-n">' + aName + '</span></div>' +
+        '</div>';
+
+      card.onclick = function() { showDetail(g, type); };
+      el.appendChild(card);
     });
-    html += '</tbody></table></div>';
-    var div = document.createElement('div');
-    div.innerHTML = html;
-    while (div.firstChild) el.appendChild(div.firstChild);
+  });
+
+  if (document.getElementById('koTabBracket') && document.getElementById('koTabBracket').classList.contains('active')) {
+    renderBracketTree(games);
+  }
+}
+
+/* ====== KNOCKOUT TOGGLE + BRACKET TREE ====== */
+var _KO_GAMES_CACHE = [];
+
+function switchKoTab(tab) {
+  document.getElementById('koTabMatches').classList.toggle('active', tab === 'matches');
+  document.getElementById('koTabBracket').classList.toggle('active', tab === 'bracket');
+  document.getElementById('koList').classList.toggle('hidden', tab !== 'matches');
+  document.getElementById('koBracket').classList.toggle('hidden', tab !== 'bracket');
+  if (tab === 'bracket') renderBracketTree(_KO_GAMES_CACHE);
+}
+
+function renderBracketTree(games) {
+  var el = document.getElementById('koBracket');
+  if (!el || !games.length) return;
+
+  var roundMeta = {
+    3: { key: 3, label: 'دور 16',     next: 4 },
+    4: { key: 4, label: 'ربع النهائي', next: 5 },
+    5: { key: 5, label: 'نصف النهائي', next: 6 },
+    6: { key: 6, label: '🏆 النهائي',  next: null }
+  };
+
+  var grouped = {};
+  games.forEach(function(g) {
+    var sn = g.stageNum;
+    if (!roundMeta[sn]) return;
+    if (!grouped[sn]) grouped[sn] = [];
+    grouped[sn].push(g);
+  });
+
+  var hasAny = false;
+  for (var k in grouped) { if (grouped[k].length > 0) hasAny = true; }
+  if (!hasAny) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:12px">لا توجد مباريات إقصائية بعد</div>'; return; }
+
+  var roundOrder = [3, 4, 5, 6].filter(function(r) { return grouped[r] && grouped[r].length > 0; });
+
+  roundOrder.forEach(function(r) {
+    grouped[r].sort(function(a, b) {
+      return (a.startTime || 0) - (b.startTime || 0);
+    });
+  });
+
+  var winners = {};
+
+  function getTeamSide(game, side) {
+    var c = side === 'home' ? game.homeCompetitor : game.awayCompetitor;
+    var name = (c && c.name) || '—';
+    var code = (c && c.symbolicName) && _FLAG_ISO2[c.symbolicName];
+    var flagSrc = code ? 'https://flagcdn.com/24x18/' + code + '.png' : '';
+    var rawScore = (c && c.score != null) ? Math.round(c.score) : null;
+    var score = (rawScore !== null && rawScore >= 0) ? rawScore : null;
+    var sym = (c && c.symbolicName) || '';
+    var type = statusGroupToType(game.statusGroup);
+    var isWinner = false;
+    if (type === 'finished' && score !== null) {
+      var oppC = side === 'home' ? game.awayCompetitor : game.homeCompetitor;
+      var oppRaw = (oppC && oppC.score != null) ? Math.round(oppC.score) : null;
+      var oppScore = (oppRaw !== null && oppRaw >= 0) ? oppRaw : null;
+      if (oppScore !== null && score > oppScore) isWinner = true;
+    }
+    return { name: name, flagSrc: flagSrc, score: score, sym: sym, isWinner: isWinner };
+  }
+
+  var wrap = document.createElement('div');
+  wrap.className = 'br-wrap';
+
+  var lastColY = {};
+
+  roundOrder.forEach(function(rnd, ri) {
+    var rndGames = grouped[rnd];
+    var meta = roundMeta[rnd];
+    var col = document.createElement('div');
+    col.className = 'br-column';
+
+    var title = document.createElement('div');
+    title.className = 'br-col-title';
+    title.textContent = meta.label;
+    col.appendChild(title);
+
+    var spacer = document.createElement('div');
+    spacer.className = 'br-spacer';
+    col.appendChild(spacer);
+
+    rndGames.forEach(function(g, gi) {
+      var home = getTeamSide(g, 'home');
+      var away = getTeamSide(g, 'away');
+      var type = statusGroupToType(g.statusGroup);
+
+      var homeWinner = false, awayWinner = false;
+      if (type === 'finished' && home.score !== null && away.score !== null) {
+        if (home.score > away.score) homeWinner = true;
+        else if (away.score > home.score) awayWinner = true;
+      }
+
+      var matchId = g.gameId || g.id;
+      winners[matchId] = homeWinner ? home : awayWinner ? away : null;
+
+      var card = document.createElement('div');
+      card.className = 'br-matchup';
+      card.onclick = (function(game, tp) { return function() { showDetail(game, tp); }; })(g, type);
+
+      var teamRow = function(side, won) {
+        var cls = 'br-team' + (won ? ' winner' : '');
+        var flagHtml = side.flagSrc ? '<img class="br-flag" src="' + side.flagSrc + '" alt="" onerror="this.style.display=\'none\'">' : '';
+        var scoreHtml = side.score !== null ? '<span class="br-ts">' + side.score + '</span>' : '';
+        return '<div class="' + cls + '">' +
+          flagHtml +
+          '<span class="br-tname">' + side.name + '</span>' +
+          scoreHtml + '</div>';
+      };
+
+      var vsRow = type === 'finished'
+        ? '<div class="br-vs">' + (g.penaltyScore ? 'ركلات ترجيح' : 'انتهت') + '</div>'
+        : type === 'live'
+          ? '<div class="br-vs">' + (g.gameTimeDisplay || 'مباشر') + '</div>'
+          : '<div class="br-vs">VS</div>';
+
+      card.innerHTML = teamRow(home, homeWinner) + vsRow + teamRow(away, awayWinner);
+      col.appendChild(card);
+    });
+
+    lastColY[rnd] = rndGames.length;
+    wrap.appendChild(col);
+
+    if (ri < roundOrder.length - 1) {
+      var lineCol = document.createElement('div');
+      lineCol.className = 'br-column';
+      lineCol.style.minWidth = '24px';
+      lineCol.style.maxWidth = '24px';
+      lineCol.appendChild(document.createElement('div'));
+      lineCol.appendChild(document.createElement('div'));
+
+      var numMatches = rndGames.length;
+      for (var li = 0; li < numMatches; li++) {
+        var line = document.createElement('div');
+        line.style.height = '46px';
+        line.style.display = 'flex';
+        line.style.alignItems = 'center';
+        line.style.justifyContent = 'center';
+        line.innerHTML = '<span style="color:var(--primary);font-size:8px;opacity:.5">▸</span>';
+        lineCol.appendChild(line);
+      }
+      wrap.appendChild(lineCol);
+    }
+  });
+
+  el.innerHTML = '';
+  el.appendChild(wrap);
+}
+
+/* ====== FEATURED MATCHES (NEXT MATCH + COUNTDOWN) ====== */
+var _COUNTDOWN_INTERVAL = null;
+
+function renderFeatured(games) {
+  var el = document.getElementById('featuredList');
+  if (!el) return;
+
+  var upcoming = [];
+  games.forEach(function(g) {
+    var type = statusGroupToType(g.statusGroup);
+    if (type === 'notstarted') upcoming.push(g);
+  });
+  upcoming.sort(function(a,b) { return parseStartTime(a) - parseStartTime(b); });
+
+  var next = upcoming.slice(0, 5);
+  if (next.length === 0) { el.innerHTML = ''; return; }
+
+  el.innerHTML = '';
+  next.forEach(function(g) {
+    var hComp = g.homeCompetitor;
+    var aComp = g.awayCompetitor;
+    var hName = (hComp && hComp.name) || '—';
+    var aName = (aComp && aComp.name) || '—';
+    var d = parseStartTime(g);
+    var dateStr = d.toLocaleDateString('ar-EG', { weekday:'short', day:'numeric', month:'short', timeZone: 'Africa/Cairo' });
+    var timeStr = formatTime12(d);
+
+    var card = document.createElement('div');
+    card.className = 'mc mc-upcoming';
+    card.innerHTML =
+      '<div class="mc-hdr"><span class="mc-round">' + roundLabel(g) + '</span><span class="mc-date">' + dateStr + '</span><span class="mc-badge b-up">' + timeStr + '</span></div>' +
+      '<div class="mc-body">' +
+        '<div class="mc-team mc-home">' + getFlag(hComp && hComp.symbolicName) + '<span class="mc-n">' + hName + '</span></div>' +
+        '<div class="mc-score-wrap mc-vs-wrap"><span class="mc-vs-text">VS</span></div>' +
+        '<div class="mc-team mc-away">' + getFlag(aComp && aComp.symbolicName) + '<span class="mc-n">' + aName + '</span></div>' +
+      '</div>' +
+      '<div class="mc-sc fb-timer" data-start="' + g.startTime + '"><span class="fb-timer-lbl">يبدأ بعد </span><span class="fb-timer-val">--:--:--</span></div>';
+    card.onclick = function() { showDetail(g, 'upcoming'); };
+    el.appendChild(card);
+  });
+
+  if (_COUNTDOWN_INTERVAL) clearInterval(_COUNTDOWN_INTERVAL);
+  _COUNTDOWN_INTERVAL = setInterval(updateCountdowns, 1000);
+  updateCountdowns();
+}
+
+function updateCountdowns() {
+  var timers = document.querySelectorAll('.fb-timer');
+  var now = new Date();
+  var nowMs = now.getTime() + now.getTimezoneOffset() * 60000; // convert local to UTC
+  timers.forEach(function(el) {
+    var start = el.getAttribute('data-start');
+    if (!start) return;
+    var matchTime = new Date(start).getTime();
+    var diff = matchTime - nowMs;
+    if (diff <= 0) {
+      el.querySelector('.fb-timer-val').textContent = 'بدأت!';
+      return;
+    }
+    var days = Math.floor(diff / 86400000);
+    var hours = Math.floor((diff % 86400000) / 3600000);
+    var mins = Math.floor((diff % 3600000) / 60000);
+    var secs = Math.floor((diff % 60000) / 1000);
+    var str = '';
+    if (days > 0) str += days + 'd ';
+    str += pad(hours) + ':' + pad(mins) + ':' + pad(secs);
+    el.querySelector('.fb-timer-val').textContent = str;
   });
 }
 
-/* ====== STANDINGS OVERLAY ====== */
-function showSD(idx) {
-  var g = _GROUPS_DATA[idx];
-  if (!g) return;
-  var s = document.getElementById('standsDetail');
-  var el = document.getElementById('standsDetailInner');
 
-  var allRows = [];
-  try {
-    var raw = __standingsRows;
-    if (raw) allRows = raw.filter(function(r) { return r.groupNum === g.num; });
-  } catch(e) {}
-
-  if (allRows.length === 0) { closeSD(); return; }
-
-  allRows.sort(function(a,b) { return (b.points||0) - (a.points||0) || (b.ratio||0) - (a.ratio||0); });
-
-  var letter = (g.num >= 1 && g.num <= 12) ? GROUP_LETTERS[g.num - 1] : '';
-  var html = '<div class="sd-close" onclick="closeSD(event)">✕</div>';
-  html += '<div class="sd-header">المجموعة ' + letter + '</div>';
-  html += '<table class="st-tbl sd-tbl"><thead><tr><th></th><th class="st-tl">الفريق</th><th>ل</th><th>ف</th><th>ت</th><th>خ</th><th>له</th><th>عليه</th><th>+/-</th><th class="st-pts-h">ن</th></tr></thead><tbody>';
-  allRows.forEach(function(r, i) {
-    var name = (r.competitor && r.competitor.name) || '—';
-    var cls = i < 2 ? 'st-q' : '';
-    html += '<tr class="' + cls + '"><td class="st-r">' + (i+1) + '</td><td class="st-tl">' + getFlag(r.competitor && r.competitor.symbolicName) + ' ' + name + '</td><td>' + (r.gamePlayed||0) + '</td><td>' + (r.gamesWon||0) + '</td><td>' + (r.gamesEven||0) + '</td><td>' + (r.gamesLost||0) + '</td><td>' + (r['for']||0) + '</td><td>' + (r.against||0) + '</td><td class="st-gd">' + (r.ratio > 0 ? '+' : '') + (r.ratio||0) + '</td><td class="st-pts"><strong>' + (r.points||0) + '</strong></td></tr>';
-  });
-  html += '</tbody></table>';
-
-  el.innerHTML = html;
-  s.classList.remove('hidden');
+/* ====== TOP SCORERS ====== */
+function fetchTopScorers() {
+  fetch(API_STATS).then(function(r) { return r.json(); }).then(function(data) {
+    var rows = data && data.stats && data.stats.athletesStats && data.stats.athletesStats[0] && data.stats.athletesStats[0].rows;
+    if (!rows || rows.length === 0) return;
+    _TOP_SCORERS = rows.slice(0, 4);
+    renderTopScorers();
+  }).catch(function() {});
 }
 
-var __standingsRows = [];
+function renderTopScorers() {
+  var el = document.getElementById('topScorersList');
+  if (!el || _TOP_SCORERS.length === 0) return;
 
-function closeSD(e) {
-  if (e && e.target !== e.currentTarget && !e.target.classList.contains('sd-close')) return;
-  var el = document.getElementById('standsDetail');
-  if (el) el.classList.add('hidden');
+  el.innerHTML = '';
+  _TOP_SCORERS.forEach(function(row, idx) {
+    var ent = row.entity;
+    if (!ent) return;
+    var name = ent.shortName || ent.name || '';
+    var goals = row.stats && row.stats[0] ? row.stats[0].value : '0';
+    var imgUrl = 'https://img.a.transfermarkt.technology/portrait/small/' + ent.id + '.png';
+    var flagCode = '';
+    var teamName = '';
+    if (_COMPETITOR_MAP[ent.competitorId]) {
+      flagCode = _COMPETITOR_MAP[ent.competitorId].symbolicName;
+      teamName = _COMPETITOR_MAP[ent.competitorId].name;
+    } else if (_TEAM_MAP[ent.competitorId]) {
+      flagCode = _TEAM_MAP[ent.competitorId].s;
+      teamName = _TEAM_MAP[ent.competitorId].n;
+    }
+    var flagUrl = flagCode && _FLAG_ISO2[flagCode] ? 'https://flagcdn.com/24x18/' + _FLAG_ISO2[flagCode] + '.png' : '';
+    var initials = name.split(' ').map(function(w){ return w.charAt(0); }).join('').substring(0,2).toUpperCase();
+
+    var card = document.createElement('div');
+    card.className = 'ts-card';
+    card.onclick = function() { showPlayerPopup(name, imgUrl, teamName, flagUrl, goals, ent.positionShortName || '', initials); };
+
+    var flagHtml = flagUrl ? '<img class="ts-flag" src="' + flagUrl + '" alt="" onerror="this.style.display=\'none\'">' : '';
+
+    card.innerHTML =
+      '<div class="ts-rank">' + (idx + 1) + '</div>' +
+      '<div class="ts-avatar" data-initials="' + initials + '">' +
+        '<img class="ts-img" src="' + imgUrl + '" alt="' + name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'ts-fallback\')">' +
+      '</div>' +
+      '<div class="ts-info">' +
+        '<span class="ts-name">' + name + '</span>' +
+        '<span class="ts-team">' + flagHtml + teamName + '</span>' +
+      '</div>' +
+      '<div class="ts-goals"><span class="ts-g-num">' + goals + '</span><span class="ts-g-label">هدف</span></div>';
+    el.appendChild(card);
+  });
+}
+
+function showPlayerPopup(name, imgUrl, teamName, flagUrl, goals, position, initials) {
+  var existing = document.getElementById('playerPopup');
+  if (existing) existing.remove();
+
+  var flagHtml = flagUrl ? '<img src="' + flagUrl + '" style="width:20px;height:14px;border-radius:2px;vertical-align:middle;margin-left:4px" alt="" onerror="this.style.display=\'none\'">' : '';
+
+  var ov = document.createElement('div');
+  ov.id = 'playerPopup';
+  ov.className = 'player-popup-overlay';
+  ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
+
+  ov.innerHTML =
+    '<div class="player-popup-card">' +
+      '<button class="pp-close" onclick="document.getElementById(\'playerPopup\').remove()">✕</button>' +
+      '<div class="pp-avatar" data-initials="' + (initials || '') + '">' +
+        '<img class="pp-img" src="' + imgUrl + '" alt="' + name + '" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'pp-fallback\')">' +
+      '</div>' +
+      '<div class="pp-name">' + name + '</div>' +
+      '<div class="pp-team">' + flagHtml + teamName + (position ? ' · ' + position : '') + '</div>' +
+      '<div class="pp-goals"><span class="pp-g-num">' + goals + '</span><span class="pp-g-label">هدف</span></div>' +
+    '</div>';
+
+  document.body.appendChild(ov);
 }
 
 /* ====== INIT ====== */
 function initHome() {
   fetchData();
-  fetchStandings();
 }
 
 var hd = document.getElementById('heroDate');
@@ -531,6 +1214,7 @@ function handleRoute() {
     }, 30000);
   } else {
     if (_AUTO_REFRESH) { clearInterval(_AUTO_REFRESH); _AUTO_REFRESH = null; }
+    if (_COUNTDOWN_INTERVAL) { clearInterval(_COUNTDOWN_INTERVAL); _COUNTDOWN_INTERVAL = null; }
   }
   if (page === 'vip') renderVip();
   if (page === 'player') {
@@ -638,11 +1322,10 @@ if (window.location.hash) handleRoute();
 var _global = (function(){ return this; })();
 _global.closeDetail = closeDetail;
 _global.watchMatch = watchMatch;
-_global.showSD = showSD;
-_global.closeSD = closeSD;
 _global.fetchData = fetchData;
-_global.fetchStandings = fetchStandings;
 _global.navigateTo = navigateTo;
+_global.switchView = switchView;
+_global.switchKoTab = switchKoTab;
 
 console.log('app.js initialized');
 })();

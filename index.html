@@ -161,36 +161,57 @@
         <div class="hero-live-count" id="heroLiveCount"></div>
       </div>
 
-      <!-- قسم المباريات (اليوم فقط) -->
+      <!-- قسم المباريات -->
       <div id="matchesSection">
+
+        <!-- أبرز المباريات -->
+        <div id="featuredBar">
+          <div class="fb-header">
+            <span class="fb-icon">🔥</span>
+            <span class="fb-title">أبرز المباريات</span>
+          </div>
+          <div id="featuredList"></div>
+        </div>
+
+        <div class="view-toggle">
+          <button class="view-btn active" id="viewTodayBtn" onclick="switchView('today')">📅 اليوم</button>
+          <button class="view-btn" id="viewAllBtn" onclick="switchView('all')">📋 كل المباريات</button>
+
+        </div>
         <div id="matchError" class="error-box hidden">
           <span>⚠️ تعذر تحميل المباريات</span>
           <button class="retry-btn" onclick="fetchData()">إعادة المحاولة</button>
         </div>
         <div id="matchesList"></div>
-      </div>
+        <div id="scheduleList" class="hidden"></div>
 
-      <!-- قسم الترتيب -->
-      <div id="standingsSection" class="standings-wrap">
-        <div class="section-header">
-          <span class="sh-icon">🏆</span>
-          <span>ترتيب المجموعات</span>
+        <!-- الأدوار الإقصائية -->
+        <div id="knockoutSection">
+          <div class="fb-header">
+            <span class="fb-icon">🏆</span>
+            <span class="fb-title">الأدوار الإقصائية</span>
+          </div>
+          <div class="ko-tabs">
+            <button class="ko-tab active" id="koTabMatches" onclick="switchKoTab('matches')">⚽ المباريات</button>
+            <button class="ko-tab" id="koTabBracket" onclick="switchKoTab('bracket')">🌳 الشجرة</button>
+          </div>
+          <div id="koList"></div>
+          <div id="koBracket" class="ko-bracket hidden"></div>
         </div>
-        <div id="standingsList" class="standings-grid"></div>
-        <div id="standingsError" class="error-box hidden" style="margin-top:8px">
-          <span>⚠️ تعذر تحميل الترتيب</span>
-          <button class="retry-btn" onclick="fetchStandings()">إعادة المحاولة</button>
+
+        <!-- أبرز الهدافين -->
+        <div id="topScorersSection" class="ts-section">
+          <div class="ts-header">
+            <span class="ts-icon">⚽</span>
+            <span class="ts-title">الهدافين</span>
+          </div>
+          <div id="topScorersList" class="ts-grid"></div>
         </div>
       </div>
 
       <!-- بطاقة المباراة الموسعة (تظهر عند الضغط) -->
       <div id="matchDetail" class="match-detail-overlay hidden" onclick="closeDetail(event)">
         <div class="match-detail-card" id="matchDetailInner"></div>
-      </div>
-
-      <!-- تفاصيل المجموعة الموسعة (تظهر عند الضغط) -->
-      <div id="standsDetail" class="sd-overlay hidden" onclick="closeSD(event)">
-        <div class="sd-card" id="standsDetailInner"></div>
       </div>
 
     </div>
